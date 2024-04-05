@@ -24,8 +24,7 @@ function Contact() {
 
       const productsData = await Products();
       setProducts(productsData);
-
-      console.log(productsData);
+      
     })();
   }, [cart]);
 
