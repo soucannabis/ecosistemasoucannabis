@@ -3,7 +3,7 @@ import User from "../../../modules/User";
 import apiRequest from "../../../modules/apiRequest";
 import ModalPayment from "../modals/shopPayment";
 
-const Cart = ({ items, onDeleteItem }) => {
+const Cart = ({ items, onDeleteItem, coupon }) => {
   const [user, setUser] = useState({});
   const [itemsCheckout, setItemsCheckout] = useState([]);
   const [linkPayment, setLinkPayment] = useState([]);
@@ -48,9 +48,11 @@ const Cart = ({ items, onDeleteItem }) => {
     }
 
     const userFullname = user.name_associate + " " + user.lastname_associate
-    const amount = parseInt((cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2)) * 100)
+    const amount = parseInt((cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - (cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))*(coupon/100)))
     const address = formData.street + " - " + formData.number + " - " + formData.neighborhood + " - " + formData.complement
     const phone = separatePhoneNumber(user.mobile_number);
+
+    console.log(amount)
 
     var requestBody = {
       "items": [],
@@ -69,7 +71,7 @@ const Cart = ({ items, onDeleteItem }) => {
       },
       "payments": [
         {
-          "amount": amount+100,
+          "amount": amount*100,
           "payment_method": "checkout",
           "checkout": {
             "expires_in": 120,
@@ -121,18 +123,19 @@ const Cart = ({ items, onDeleteItem }) => {
     }
 
     itemsCheckout.forEach(item => {
-      const itemPrice = parseInt(item.price * 100)
+      var itemPrice = parseInt(item.price * 100)
+          itemPrice = parseInt(itemPrice - (itemPrice*(coupon/100)))
       requestBody.items.push({
         "amount": itemPrice,
-        "description": item.name,
+        "description": item.cod,
         "quantity": 1,
         "code": item.cod
       })
     }) 
 
     const paymentPagarme = await apiRequest("/api/pagarme/orders", requestBody, "POST")
-    setLinkPayment(paymentPagarme.checkouts[0].payment_url)
-    window.location.assign(paymentPagarme.checkouts[0].payment_url);
+   setLinkPayment(paymentPagarme.checkouts[0].payment_url)
+   window.location.assign(paymentPagarme.checkouts[0].payment_url);
   }
 
   return (
@@ -167,12 +170,13 @@ const Cart = ({ items, onDeleteItem }) => {
 
             )
           )}
-          <tr></tr>
           <tr>
-            <th></th>
-            <td></td>
             <td>Total: </td>
-            <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))}</td>
+            <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))}</td>            
+          </tr>
+          <tr>
+            <td>Total com desconto: </td>
+            <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - (cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))*(coupon/100))}</td>
           </tr>
         </tbody>
       </table>
