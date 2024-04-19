@@ -8,6 +8,7 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
   const [itemsCheckout, setItemsCheckout] = useState([]);
   const [linkPayment, setLinkPayment] = useState([]);
   const [paymentButton, setPaymentButton] = useState("none");
+  const [itemPrice, setItemPrice] = useState(0);
 
 
   useEffect(() => {
@@ -48,11 +49,17 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
     }
 
     const userFullname = user.name_associate + " " + user.lastname_associate
-    const amount = parseInt((cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - (cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))*(coupon/100)))
+    var amount = 0
+
+    if (coupon.type == "percentage") {
+      amount = parseInt((cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - (cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2)) * (coupon.discount / 100)))
+    } else {
+      amount = parseInt((cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - coupon.discount))
+    }
+
     const address = formData.street + " - " + formData.number + " - " + formData.neighborhood + " - " + formData.complement
     const phone = separatePhoneNumber(user.mobile_number);
 
-    console.log(amount)
 
     var requestBody = {
       "items": [],
@@ -71,7 +78,7 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
       },
       "payments": [
         {
-          "amount": amount*100,
+          "amount": amount * 100,
           "payment_method": "checkout",
           "checkout": {
             "expires_in": 120,
@@ -123,19 +130,19 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
     }
 
     itemsCheckout.forEach(item => {
-      var itemPrice = parseInt(item.price * 100)
-          itemPrice = parseInt(itemPrice - (itemPrice*(coupon/100)))
+      var price = parseInt((item.price * 100) / item.qntProductCart)
+
       requestBody.items.push({
-        "amount": itemPrice,
+        "amount": price,
         "description": item.cod,
-        "quantity": 1,
+        "quantity": item.qntProductCart,
         "code": item.cod
       })
-    }) 
+    })
 
     const paymentPagarme = await apiRequest("/api/pagarme/orders", requestBody, "POST")
-   setLinkPayment(paymentPagarme.checkouts[0].payment_url)
-   window.location.assign(paymentPagarme.checkouts[0].payment_url);
+    setLinkPayment(paymentPagarme.checkouts[0].payment_url)
+    window.location.assign(paymentPagarme.checkouts[0].payment_url);
   }
 
   return (
@@ -145,7 +152,7 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
           <tr>
             <th scope="col">#</th>
             <th scope="col">Produto</th>
-            <th scope="col">Tipo</th>
+            <th scope="col">Qnt</th>
             <th scope="col">Preço</th>
             <th scope="col">X</th>
           </tr>
@@ -158,7 +165,7 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
                 <tr>
                   <th scope="row">{index + 1}</th>
                   <td>{item.name + item.concentration}</td>
-                  <td>{item.type}</td>
+                  <td>{item.qntProductCart}</td>
                   <td>{item.price}</td>
                   <td>
                     <button onClick={deleteItem} value={item.id}>
@@ -171,16 +178,20 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
             )
           )}
           <tr>
-            <td>Total: </td>
-            <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))}</td>            
+            <td><p  style={{marginTop:"60px"}}>Total:</p> </td>
+            <td><p  style={{marginTop:"30px"}}> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))}</p> </td>
           </tr>
           <tr>
             <td>Total com desconto: </td>
-            <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - (cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))*(coupon/100))}</td>
+            {coupon.type == "percentage" ? (
+              <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - (cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2)) * (coupon.discount / 100))}</td>
+            ) : (
+              <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - coupon.discount)}</td>
+            )}
           </tr>
         </tbody>
       </table>
-      <ModalPayment payment={payment} itemsCheckout={itemsCheckout}/>      
+      <ModalPayment payment={payment} itemsCheckout={itemsCheckout} />
     </div>
   );
 };

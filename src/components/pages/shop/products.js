@@ -3,8 +3,9 @@ import User from "../../../modules/User";
 import Products from "../../../modules/Products";
 import Cart from "../elements/cart";
 import Modal from "react-bootstrap/Modal";
+import apiRequest from "../../../modules/apiRequest";
 
-function Contact() {
+function Shop() {
   const [user, setUser] = useState({});
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,6 +13,7 @@ function Contact() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [cart, setCart] = useState([]);
   const [popupContent, setPopupContent] = useState([]);
+  const [productQnt, setProductQnt] = useState(1);
   const [coupon, setCoupon] = useState(1);
 
   const [showPopup, setShowPopup] = useState(false);
@@ -27,9 +29,8 @@ function Contact() {
       const productsData = await Products();
       setProducts(productsData.response.productsList);
 
-      if(productsData.response.coupon){
-        setCoupon(productsData.response.coupon.discount)
-      }
+      const coupon = await apiRequest("/api/directus/coupons?couponSearchId=" + userData.id, "", "GET");
+      setCoupon(coupon)
 
       var date = new Date();
       var date_prescription = new Date(userData.date_prescription);
@@ -40,7 +41,7 @@ function Contact() {
 
       if (dateDiffDays > 365) {
         setPrescriptionPopup(true)
-      }      
+      }
 
     })();
   }, [cart]);
@@ -63,13 +64,23 @@ function Contact() {
     { key: "name", label: "Nome" },
     { key: "description", label: "Descrição" },
     { key: "price", label: "Preço" },
+    { key: "qnt", label: "Quantidade" },
     { key: "checkout", label: "Add Carrinho" },
   ];
 
   const filteredProducts = sortProducts().filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   function addCart(product) {
-    setCart([...cart, product]);
+    const productCart = cart.some(item => item.id === product.id);
+    var productQnt = parseInt(document.getElementById(product.cod).value)
+
+    product.qntProductCart = productQnt
+    product.price = product.price * productQnt
+
+    if (!productCart) {
+      setCart([...cart, product]);
+    }
+
   }
 
   function deleteItem(product) {
@@ -81,6 +92,17 @@ function Contact() {
     setPopupContent(productCod);
     setShowPopup(true);
   }
+
+  function productQntHandle(id, value, el) {
+    const products = JSON.parse(user.products)
+    const product = products.find(item => item.product === id);
+    el.target.max = product.qnt
+    setProductQnt(prevState => ({
+      ...prevState,
+      [id]: value
+    }));
+  }
+
 
   return (
     <div>
@@ -126,7 +148,12 @@ function Contact() {
             <div>
               <div class="sidebar" style={{ padding: "30px" }}>
                 <h4 style={{ textAlign: "center", marginBottom: "30px" }}>Carrinho de compras</h4>
-                <p>Você tem um cupom com {coupon} % de desconto</p>
+                {coupon && coupon.type == "percentage" ? (
+                  <p>Você tem um cupom com {coupon.discount}% de desconto</p>
+                ) : (
+                  <p>Você tem um cupom com R${coupon.discount} reais de desconto</p>
+                )}
+
                 <Cart items={cart} coupon={coupon} onDeleteItem={deleteItem} />
               </div>
             </div>
@@ -164,6 +191,9 @@ function Contact() {
                     <td>{product.description}</td>
                     <td>{String(product.price)}</td>
                     <td>
+                      <input type="number" id={product.cod} min={1} max={10} onChange={(e) => productQntHandle(product.cod, e.target.value, e)} value={productQnt[product.cod] || 1} />
+                    </td>
+                    <td>
                       <button width="38" height="38" alt="checkout" onClick={() => addCart(product)}>
                         Add Cart
                       </button>
@@ -181,4 +211,4 @@ function Contact() {
   );
 }
 
-export default Contact;
+export default Shop;
