@@ -9,14 +9,45 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
   const [linkPayment, setLinkPayment] = useState([]);
   const [paymentButton, setPaymentButton] = useState("none");
   const [itemPrice, setItemPrice] = useState(0);
-
+  const [delivery, setDelivery] = useState([]);
+  const [deliveryPrice, setDeliveryPrice] = useState(0);
+  const [cartTotall, setCartTotal] = useState(0);
+  const [cartTotalll, setCartTotalll] = useState(0);
 
   useEffect(() => {
     (async () => {
       const userData = await User();
       setUser(userData);
+
+      var correios = await apiRequest("/api/correios/shipment-calculate", { cepFrom: "75093750", cepTo: userData.cep }, "POST")
+      correios = correios.filter(service => service.name === "PAC" || service.name === "SEDEX");
+      correios = correios.filter(method => !method.error)
+      setDelivery(correios)
     })();
+
+    if (items) {
+      const products = items.reduce((acc, item) => acc + item.price, 0)
+      const discount = coupon.discount
+      var total = 0
+ 
+      if(coupon && coupon.type != "percentage"){
+        total = products - discount
+      }else{
+        total = (products * discount) / 100
+        total = parseInt(products - total)
+      }
+
+      setCartTotal({ ...cartTotall, products, discount, total })
+
+      const inputRadios = document.getElementsByName("deliveryMethod")
+      inputRadios.forEach(radio => {
+        radio.checked = false;
+      });
+
+    }
+
     setItemsCheckout(items);
+
   }, [items]);
 
   var cartTotal = [];
@@ -25,12 +56,24 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
     return <div></div>;
   }
 
+
   function deleteItem(event) {
     event.preventDefault();
     items = itemsCheckout.filter(item => item.id != event.target.value);
     setItemsCheckout(items);
     onDeleteItem(items)
+
+    delete cartTotall.delivery
+    const inputRadios = document.getElementsByName("deliveryMethod")
+    inputRadios.forEach(radio => {
+      radio.checked = false;
+    });
   }
+
+  const handleRadioChange = (event) => {
+    setCartTotal({ ...cartTotall, delivery: parseFloat(event.target.value) })
+  };
+
 
   const payment = async function payment(formData) {
 
@@ -48,22 +91,17 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
       };
     }
 
-    const userFullname = user.name_associate + " " + user.lastname_associate
-    var amount = 0
+    const amount = parseInt(cartTotall.total + cartTotall.delivery).toFixed(2)
 
-    if (coupon.type == "percentage") {
-      amount = parseInt((cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - (cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2)) * (coupon.discount / 100)))
-    } else {
-      amount = parseInt((cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - coupon.discount))
-    }
+    const userFullname = user.name_associate + " " + user.lastname_associate 
 
-    const address = formData.street + " - " + formData.number + " - " + formData.neighborhood + " - " + formData.complement
+    const address = formData.street + ", nº " + formData.number + " - " + formData.neighborhood + " - " + formData.complement + " | " + formData.city + " - " + formData.state
     const phone = separatePhoneNumber(user.mobile_number);
 
 
     var requestBody = {
       "items": [],
-      "code": user.user_code,
+      "code": null,
       "customer": {
         "name": userFullname,
         "email": user.email_account,
@@ -106,11 +144,11 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
               "installments": [
                 {
                   "number": 1,
-                  "total": amount
+                  "total": amount * 100
                 },
                 {
                   "number": 2,
-                  "total": amount
+                  "total": amount * 100
                 }
               ]
             },
@@ -136,13 +174,35 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
         "amount": price,
         "description": item.cod,
         "quantity": item.qntProductCart,
-        "code": item.cod
+        "code": item.cod,
+        "id": item.id
       })
     })
 
+    requestBody.items.push({
+      "amount": parseInt(cartTotall.delivery * 100),
+      "description": "Frete Correios",
+      "quantity": 1,
+      "code": "Frete",
+      "id": 1
+    })
+
+    var items = requestBody.items
+
+    const createOrder = {
+      "user": user.id,
+      "total": amount,
+      "status": "awaiting-payment",
+      "address": address,
+      "items": JSON.stringify(items)
+    }
+
+    const order = await apiRequest("/api/directus/create-order", createOrder, "POST")
+    requestBody.code = order.cod
+
     const paymentPagarme = await apiRequest("/api/pagarme/orders", requestBody, "POST")
     setLinkPayment(paymentPagarme.checkouts[0].payment_url)
-    window.location.assign(paymentPagarme.checkouts[0].payment_url);
+    window.open(paymentPagarme.checkouts[0].payment_url);
   }
 
   return (
@@ -158,6 +218,7 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
           </tr>
         </thead>
         <tbody>
+          {console.log(cartTotall)}
           {itemsCheckout.map(
             (item, index) => (
               cartTotal.push(item.price),
@@ -178,16 +239,26 @@ const Cart = ({ items, onDeleteItem, coupon }) => {
             )
           )}
           <tr>
-            <td><p  style={{marginTop:"60px"}}>Total:</p> </td>
-            <td><p  style={{marginTop:"30px"}}> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2))}</p> </td>
+            <td><p style={{ marginTop: "60px" }}>Frete:</p></td>
+            <td>
+              {delivery.map((method, index) => (
+                <div key={index}>
+                  <input type="radio" name="deliveryMethod" onChange={handleRadioChange} value={method.price} />
+                  <label>{method.name + " - R$" + method.price}</label>
+                </div>
+              ))}
+
+
+            </td>
           </tr>
           <tr>
-            <td>Total com desconto: </td>
-            {coupon.type == "percentage" ? (
-              <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - (cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2)) * (coupon.discount / 100))}</td>
-            ) : (
-              <td> {(cartTotal.reduce((total, valor) => total + valor, 0).toFixed(2) - coupon.discount)}</td>
-            )}
+            <td><p style={{ marginTop: "60px" }}>Total:</p> </td>
+            <td><p style={{ marginTop: "30px" }}>{parseFloat(cartTotall.products + cartTotall.delivery)}</p> </td>
+          </tr>
+          <tr>
+            <td>Total com desconto: </td>        
+              <td> {parseFloat(cartTotall.total + cartTotall.delivery).toFixed(2)}</td>
+
           </tr>
         </tbody>
       </table>
