@@ -25,28 +25,6 @@ const AssociateSignUp = () => {
   const handleClose = () => setShowPopup(false);
   const handleShow = () => setShowPopup(true);
   const [passError, setPassError] = useState(false);
-
-
-  useEffect(() => {
-    (async () => {
-      const userData = await User();
-      setUser(userData);
-    })();
-
-    const timer = setTimeout(() => { }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (user.associate_status > 3) {
-    window.location.assign("/");
-  }
-
-  const [phone, setPhone] = useState("");
-
-  const handleOnChange = (value, country) => {
-    setPhone(value);
-  };
-
   const [formData, setFormData] = useState({
     responsable_type: null,
     name_associate: null,
@@ -71,6 +49,38 @@ const AssociateSignUp = () => {
     associate_status: 3,
     pass_account: null,
   });
+  const [counterTratmentOptions, setCounterTratment] = useState(false);
+  const [counterCheck, setCounterCheck] = useState(false);
+  const [emptyFieldsMessage, setEmptyFieldsMessage] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const userData = await User();
+      setUser(userData);
+    })();
+
+    const timer = setTimeout(() => { }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (formData.reason_treatment && formData.reason_treatment.length == 10) {
+      setCounterCheck(true)
+    } else {
+      setCounterCheck(false)
+    }
+
+  }, [formData]);
+
+  if (user.associate_status > 3) {
+    window.location.assign("/");
+  }
+
+  const [phone, setPhone] = useState("");
+
+  const handleOnChange = (value, country) => {
+    setPhone(value);
+  };
 
   const handleChangeInput = event => {
     setFormData({
@@ -85,6 +95,10 @@ const AssociateSignUp = () => {
       ["reason_treatment"]: event,
     });
   };
+
+  function counter() {
+    setCounterTratment(true)
+  }
 
   const handleChangeInputPhone = event => {
     setFormData({
@@ -145,27 +159,68 @@ const AssociateSignUp = () => {
   const updateUser = async event => {
     event.preventDefault();
 
-    console.log(formData)
-
     var emptyFields = [];
+    var fieldsNames = []
 
     for (let key in formData) {
       if (formData.hasOwnProperty(key)) {
         if (formData[key] == null || formData[key] == undefined || formData[key] == "" || formData[key] == []) {
-          emptyFields.push(key);
-          if (key != "mobile_number" && key != "status" && key != "associate_status" && key != "reason_treatment") {
+          if (key != "complement") {
+            emptyFields.push(key);
+            fieldsNames.push(key);
+          }
+          if (key != "mobile_number" && key != "status" && key != "associate_status" && key != "reason_treatment" && key != "complement") {
             document.querySelector("#" + key).className = "form-input input-login input-empty";
           }
         } else {
-          if (key != "mobile_number" && key != "status" && key != "associate_status" && key != "reason_treatment") {
+          if (key != "mobile_number" && key != "status" && key != "associate_status" && key != "reason_treatment" && key != "complement") {
             document.querySelector("#" + key).className = "form-input input-login";
           }
         }
-        if (formData.reason_treatment == [] || formData.reason_treatment == null) {
-           document.querySelector(".select-treatment").className = "form-input input-login select-treatment input-empty";
-        } 
+
+        if (!formData.reason_treatment || formData.reason_treatment.length < 1) {
+          document.querySelector(".select-treatment").className = "form-input input-login select-treatment input-empty";
+        } else {
+          document.querySelector(".select-treatment").className = "select-treatment form-input input-login";
+        }
       }
     }
+
+    const translations = {
+      responsable_type: "Tipo de responsável",
+      name_associate: "Nome do associado",
+      lastname_associate: "Sobrenome do associado",
+      birthday_associate: "Data de nascimento",
+      gender: "Gênero",
+      nationality: "Nacionalidade",
+      cpf_associate: "CPF",
+      rg_associate: "RG",
+      emiiter_rg_associate: "Órgão emissor",
+      marital_status: "Estado civil",
+      mobile_number: "Número de celular",
+      pass_account: "Senha da conta",
+      street: "Rua",
+      number: "Número",
+      neighborhood: "Bairro",
+      city: "Cidade",
+      state: "Estado",
+      cep: "CEP",
+      reason_treatment: "Motivo do tratamento",
+      reason_treatment_text: "Motivo do tratamento com suas palavras"
+    };
+
+    let translatedFields = [];
+
+    fieldsNames.map(field => {
+      if (translations[field]) {
+        translatedFields.push(translations[field]);
+      }
+    });
+
+    let translatedFieldsString = translatedFields.join(", ");
+
+    setEmptyFieldsMessage(translatedFieldsString)
+
 
     if (emptyFields != []) {
       setValidateForm(true);
@@ -206,11 +261,13 @@ const AssociateSignUp = () => {
       }
 
       if (!realCPF(validateCPF)) {
-        emptyFields.push("cpf");
-        setCpfNotValid(true);
-        setTimeout(() => {
-          setCpfNotValid(false);
-        }, 6000);
+        if (formData.cpf_associate) {
+          emptyFields.push("cpf");
+          setCpfNotValid(true);
+          setTimeout(() => {
+            setCpfNotValid(false);
+          }, 6000);
+        }
       }
     }
 
@@ -249,8 +306,31 @@ const AssociateSignUp = () => {
     }
   };
 
+  function scrollDown() {
+    window.scrollTo(0, document.body.scrollHeight);
+    setCounterTratment(false)
+  }
+
   return (
     <div>
+      {counterTratmentOptions && 
+        <div class="fixed-div">
+          <div style={{ textAlign: "center" }}>Você pode selecionar até <b>10</b> motivos
+            {formData.reason_treatment ? (
+              <h5 style={{ marginTop: "7px" }}>{formData.reason_treatment.length}/10</h5>
+            ) : (
+              <h5>0/10</h5>
+            )}
+            <a class="btn btn-primary btn-sm" onClick={scrollDown}>
+              Continuar  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      }
+
+
       <form onSubmit={updateUser} className="form-container ">
         <h1>Você é responsável pelo seu próprio tratamento?</h1>
         <br></br>
@@ -290,10 +370,10 @@ const AssociateSignUp = () => {
             <label className="form-label" htmlFor="birthday_associate">
               Data de nascimento
             </label>
-            <InputMask mask="99/99/9999" onChange={handleChangeInput} onBlur={handleChangeInput} value={formData.birthday_associate} type="text" id="birthday_associate" name="birthday_associate">        
-              {inputProps =>  <input placeholder="__/__/____" class="form-input input-login" {...inputProps}  />}
+            <InputMask mask="99/99/9999" onChange={handleChangeInput} onBlur={handleChangeInput} value={formData.birthday_associate} type="text" id="birthday_associate" name="birthday_associate">
+              {inputProps => <input placeholder="__/__/____" class="form-input input-login" {...inputProps} />}
             </InputMask>
-            
+
           </div>
 
           <div className="mb-3">
@@ -424,9 +504,9 @@ const AssociateSignUp = () => {
             <label className="form-label" htmlFor="reason_treatment">
               Motivo principal para o tratamento
             </label>
-            <p style={{ color:"#fff", fontStyle:"italic" }}>Os dados deste campo são de acordo com o CIAP2 (Classificação Internacional de Atenção Primária) <a style={{color:"#fff",fontWeight:"bold"}} href="https://saude.campinas.sp.gov.br/sistemas/esus/guia_CIAP2.pdf" target="_blank">Saiba Mais</a></p>
-            <p style={{ color:"#fff", fontStyle:"italic" }}>No campo abaixo, pesquise pelo motivo do tratamento e selecione uma ou mais opções.</p>
-                <Ciap2Select  handleChange={handleSelectionChange} id="reason_treatment"   class="form-input input-login select-treatment" value={formData.reason_treatment} name="reason_treatment"  />
+            <p style={{ color: "#fff", fontStyle: "italic" }}>Os dados deste campo são de acordo com o CIAP2 (Classificação Internacional de Atenção Primária) <a style={{ color: "#fff", fontWeight: "bold" }} href="https://saude.campinas.sp.gov.br/sistemas/esus/guia_CIAP2.pdf" target="_blank">Saiba Mais</a></p>
+            <p style={{ color: "#fff", fontStyle: "italic" }}>No campo abaixo, pesquise pelo motivo do tratamento e selecione uma ou mais opções.</p>
+            <Ciap2Select handleChange={handleSelectionChange} id="reason_treatment" class="form-input input-login select-treatment" value={formData.reason_treatment} name="reason_treatment" counterCheck={counter} disableCheckbox={counterCheck} />
           </div>
 
           <div className="mb-3">
@@ -444,7 +524,7 @@ const AssociateSignUp = () => {
           <br></br>
         </div>
 
-        {fieldsError && <AlertError message="Você precisa preencher todos os campos" />}
+        {fieldsError && <AlertError message="Você precisa preencher os seguintes campos: " emptyFields={emptyFieldsMessage} />}
         {cpfError && (
           <div class="alert2">
             <AlertError message="O CPF precisa estar completo" />

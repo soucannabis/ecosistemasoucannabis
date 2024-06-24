@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const SelectComponent = ({ handleChange }) => {
+const SelectComponent = ({ handleChange, counterCheck, disableCheckbox }) => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -2650,7 +2650,6 @@ const SelectComponent = ({ handleChange }) => {
       ],
     },
   ];
-
   const handleOptionSelect = option => {
     if (!selectedOptions.includes(option.value)) {
       setSelectedOptions([...selectedOptions, option.value]);
@@ -2666,7 +2665,6 @@ const SelectComponent = ({ handleChange }) => {
   };
 
   const toggleCat = event => {
-    console.log(isCatOpen)
     if (isCatOpen) {
       if(isCatOpen == event.target.className){
         setIsCatOpen(!isCatOpen);
@@ -2699,6 +2697,7 @@ const SelectComponent = ({ handleChange }) => {
         }}
         onClick={() => {
           toggleDropdown();
+          counterCheck();
           setIsSelectOpen(true);
         }}
       />
@@ -2722,6 +2721,7 @@ const SelectComponent = ({ handleChange }) => {
                         handleOptionSelect(subcat);
                       }}
                       checked={selectedOptions.includes(subcat.value)}
+                      disabled={disableCheckbox}
                     />
                     {subcat.label}
                   </label>

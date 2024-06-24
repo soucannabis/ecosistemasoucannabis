@@ -593,6 +593,22 @@ input.option-checkbox {
 
 .option-group {padding-left: 0;}
 
+.fixed-div h5{
+  margin:10px 0
+}
+
+.fixed-div {
+  width: 240px;
+  height: 160px;
+  background-color: rgb(229, 255, 0); /* Personalize a cor de fundo */
+  position: fixed;
+  top: 60px;
+  right: 0;
+  padding:30px;
+  border-radius:0 0 0 20px;
+  font-size:18px
+}
+
 @media screen and (max-width: 600px) {
 
   body {
@@ -619,6 +635,7 @@ input.option-checkbox {
     margin-top: 20px;
   }
 
+ 
   .item-selected {
     font-size: 18px;
     text-align: left;
@@ -829,4 +846,21 @@ input.option-checkbox {
   .btn-contact>svg {
     width: 20px;
   }
+
+  .fixed-div {
+    width: 170px;
+    height: 120px;
+    background-color: rgb(229, 255, 0); /* Personalize a cor de fundo */
+    position: fixed;
+    top: 50px;
+    right: 0;
+    padding:10px;
+    border-radius:0 0 0 20px;
+    font-size:16px
+  }
+
+  .fixed-div h5{
+    margin:10px 0
+  }
 }
+

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function AlertComponent({ message }) {
+function AlertComponent({ message, emptyFields }) {
     const [showAlert, setShowAlert] = useState(false);
 
     const handleShowAlert = () => {
@@ -15,6 +15,11 @@ function AlertComponent({ message }) {
         <div className={`custom-alert ${showAlert ? 'show-alert' : ''}`}>
             <div className="alert alert-warning alert-dismissible fade show" role="alert">
                 <b className="message">{message}</b>
+                {emptyFields && (
+                    <div>
+                        {emptyFields}
+                    </div>
+                )}
                 <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
