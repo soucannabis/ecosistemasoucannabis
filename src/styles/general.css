@@ -130,11 +130,12 @@ h1.sub-title {
 
 .sidebar {
   position: fixed;
-  width: 25%;
+  width: 35%;
   height: 100%;
   background: linear-gradient(#e5e5e5, #cfd6db);
   top: 50px;
   box-shadow: 0 0 36px #000;
+  padding:50px 0 0px 30px
 }
 
 .content {

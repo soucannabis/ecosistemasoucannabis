@@ -14,7 +14,7 @@ function Shop() {
   const [cart, setCart] = useState([]);
   const [popupContent, setPopupContent] = useState([]);
   const [productQnt, setProductQnt] = useState(1);
-  const [coupon, setCoupon] = useState(1);
+  const [coupon, setCoupon] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false);
   const [prescriptionPopup, setPrescriptionPopup] = useState(false);
@@ -27,6 +27,7 @@ function Shop() {
       setUser(userData);
 
       const productsData = await Products();
+      console.log(productsData)
       setProducts(productsData.response.productsList);
 
       const coupon = await apiRequest("/api/directus/coupons?couponSearchId=" + userData.id, "", "GET");
@@ -60,12 +61,10 @@ function Shop() {
   const datePrescription = dateUser.toLocaleDateString("pt-BR");
 
   const tableHeaders = [
-    { key: "photo", label: "" },
-    { key: "name", label: "Nome" },
-    { key: "description", label: "Descrição" },
-    { key: "price", label: "Preço" },
+    { key: "name", label: "Nome do Produto" },
+    { key: "price", label: "Valor" },
     { key: "qnt", label: "Quantidade" },
-    { key: "checkout", label: "Add Carrinho" },
+    { key: "checkout", label: "+ Carrinho" },
   ];
 
   const filteredProducts = sortProducts().filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -93,10 +92,7 @@ function Shop() {
     setShowPopup(true);
   }
 
-  function productQntHandle(id, value, el) {
-    const products = JSON.parse(user.products)
-    const product = products.find(item => item.product === id);
-    el.target.max = product.qnt
+  function productQntHandle(id, value, el) {   
     setProductQnt(prevState => ({
       ...prevState,
       [id]: value
@@ -142,17 +138,23 @@ function Shop() {
         </style>
       )}
 
+
       {!prescriptionPopup && (
         <div>
           <div>
             <div>
-              <div class="sidebar" style={{ padding: "30px" }}>
+              <div class="sidebar" >
                 <h4 style={{ textAlign: "center", marginBottom: "30px" }}>Carrinho de compras</h4>
-                {coupon && coupon.type == "percentage" ? (
-                  <p>Você tem um cupom com {coupon.discount}% de desconto</p>
+                {coupon ? (
+                  coupon.type === "percentage" ? (
+                    <p>Você tem um cupom com {coupon.discount}% de desconto</p>
+                  ) : (
+                    <p>Você tem um cupom com R${coupon.discount} reais de desconto</p>
+                  )
                 ) : (
-                  <p>Você tem um cupom com R${coupon.discount} reais de desconto</p>
+                  <></>
                 )}
+
 
                 <Cart items={cart} coupon={coupon} onDeleteItem={deleteItem} />
               </div>
@@ -163,45 +165,55 @@ function Shop() {
             <button onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>Ordenar {sortOrder === "asc" ? "A-Z" : "Z-A"}</button>
           </div>
           {filteredProducts.length > 0 ? (
-            <table className="table" style={{ color: "#fff", marginLeft: "410px", width: "73%" }}>
-              <thead>
-                <tr>
-                  {tableHeaders.map(header => (
-                    <th
-                      key={header.key}
-                      onClick={() => {
-                        setSortColumn(header.key);
-                        setSortOrder(header.key === sortColumn && sortOrder === "asc" ? "desc" : "asc");
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {header.label}
-                      {header.key === sortColumn && <span> {sortOrder === "asc" ? "▲" : "▼"}</span>}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody >
-                {filteredProducts.map(product => (
-                  <tr key={product.cod} >
-                    <td>
-                      <img src={process.env.REACT_APP_DIRECTUS_API_URL + "/assets/" + product.photo} width="50" height="50" onClick={() => addCart(product)} />
-                    </td>
-                    <td onClick={info} style={{ cursor: "pointer" }} cod={product.cod}>{product.name + " - " + product.concentration + "%"}</td>
-                    <td>{product.description}</td>
-                    <td>{String(product.price)}</td>
-                    <td>
-                      <input type="number" id={product.cod} min={1} max={10} onChange={(e) => productQntHandle(product.cod, e.target.value, e)} value={productQnt[product.cod] || 1} />
-                    </td>
-                    <td>
-                      <button width="38" height="38" alt="checkout" onClick={() => addCart(product)}>
-                        Add Cart
-                      </button>
-                    </td>
+            <div className="container">
+              <table className="table" style={{ width: "63%", backgroundColor: "#fff", marginLeft: "auto", marginRight: "0", paddingLeft:"20px" }}>
+                <thead style={{ backgroundColor: "#4e774d", color: "#fff" }}>
+                  <tr>
+                    {tableHeaders.map(header => (
+                      <th
+                        key={header.key}
+                        onClick={() => {
+                          setSortColumn(header.key);
+                          setSortOrder(header.key === sortColumn && sortOrder === "asc" ? "desc" : "asc");
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        {header.label}
+                        {header.key === sortColumn && <span> {sortOrder === "asc" ? "▲" : "▼"}</span>}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredProducts.map(product => (
+                    <tr key={product.cod}>
+                      <td onClick={info} style={{ cursor: "pointer", paddingLeft:"45px", fontSize:"18px", fontWeight:600 }} cod={product.cod}>{product.cod + " - " + product.concentration + "%"}</td>
+                      <td style={{fontSize:"16px", fontWeight:600}}>R${String(product.price)}</td>
+                      <td>
+                        <select onChange={(e) => productQntHandle(product.cod, e.target.value, e)} id={product.cod} style={{marginLeft:"25px"}}>
+                          {JSON.parse(user.products)
+                            .filter(prod => prod.product === product.cod)
+                            .map(userProd => {
+                              const loop = userProd.qnt;
+                              return Array.from({ length: loop }, (_, i) => (
+                                <option   key={i + 1} value={i + 1}>
+                                  {i + 1}
+                                </option>
+                              ));
+                            })}
+                        </select>
+                      </td>
+                      <td>
+                        <button width="38" height="38" alt="checkout" onClick={() => addCart(product)}>
+                         + Carrinho
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+            </div>
           ) : (
             <p>Nenhum resultado encontrado.</p>
           )}
