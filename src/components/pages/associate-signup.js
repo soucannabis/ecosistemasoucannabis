@@ -25,6 +25,7 @@ const AssociateSignUp = () => {
   const handleClose = () => setShowPopup(false);
   const handleShow = () => setShowPopup(true);
   const [passError, setPassError] = useState(false);
+  const [ciapError, setCiapError] = useState(false);
   const [formData, setFormData] = useState({
     responsable_type: null,
     name_associate: null,
@@ -48,6 +49,7 @@ const AssociateSignUp = () => {
     reason_treatment_text: null,
     associate_status: 3,
     pass_account: null,
+    met_us:null
   });
   const [counterTratmentOptions, setCounterTratment] = useState(false);
   const [counterCheck, setCounterCheck] = useState(false);
@@ -64,7 +66,7 @@ const AssociateSignUp = () => {
   }, []);
 
   useEffect(() => {
-    if (formData.reason_treatment && formData.reason_treatment.length == 10) {
+    if (formData.reason_treatment && formData.reason_treatment.length > 10) {
       setCounterCheck(true)
     } else {
       setCounterCheck(false)
@@ -163,17 +165,18 @@ const AssociateSignUp = () => {
     var fieldsNames = []
 
     for (let key in formData) {
+
       if (formData.hasOwnProperty(key)) {
         if (formData[key] == null || formData[key] == undefined || formData[key] == "" || formData[key] == []) {
           if (key != "complement") {
             emptyFields.push(key);
             fieldsNames.push(key);
           }
-          if (key != "mobile_number" && key != "status" && key != "associate_status" && key != "reason_treatment" && key != "complement") {
+          if (key != "mobile_number" && key != "status" && key != "associate_status" && key != "reason_treatment" && key != "complement" && key != "log") {
             document.querySelector("#" + key).className = "form-input input-login input-empty";
           }
         } else {
-          if (key != "mobile_number" && key != "status" && key != "associate_status" && key != "reason_treatment" && key != "complement") {
+          if (key != "mobile_number" && key != "status" && key != "associate_status" && key != "reason_treatment" && key != "complement" && key != "log") {
             document.querySelector("#" + key).className = "form-input input-login";
           }
         }
@@ -206,7 +209,8 @@ const AssociateSignUp = () => {
       state: "Estado",
       cep: "CEP",
       reason_treatment: "Motivo do tratamento",
-      reason_treatment_text: "Motivo do tratamento com suas palavras"
+      reason_treatment_text: "Motivo do tratamento com suas palavras",
+      met_us:"Como nos conheceu"
     };
 
     let translatedFields = [];
@@ -220,7 +224,6 @@ const AssociateSignUp = () => {
     let translatedFieldsString = translatedFields.join(", ");
 
     setEmptyFieldsMessage(translatedFieldsString)
-
 
     if (emptyFields != []) {
       setValidateForm(true);
@@ -290,16 +293,23 @@ const AssociateSignUp = () => {
       setFieldsError(false);
       formData.status = "registered"
       formData.log = "Registered OK"
-      await apiRequest("/api/directus/update", { userId: user.id, formData: formData }, "POST")
-        .then(response => { })
-        .catch(error => {
-          console.error(error);
-        });
-
-      if (formData.responsable_type == "another") {
-        window.location.assign("/cadastro-paciente");
+      if (formData.reason_treatment && formData.reason_treatment.length > 10) {
+        setCiapError(true)
+        setTimeout(() => {
+          setCiapError(false);
+        }, 6000);
       } else {
-        window.location.assign("/documentos");
+        await apiRequest("/api/directus/update", { userId: user.id, formData: formData }, "POST")
+          .then(response => { })
+          .catch(error => {
+            console.error(error);
+          });
+
+        if (formData.responsable_type == "another") {
+          window.location.assign("/cadastro-paciente");
+        } else {
+          window.location.assign("/documentos");
+        }
       }
     } else {
       await apiRequest("/api/directus/update", { userId: user.id, formData: { status: "formerror", log: { "formError": { "emptyFields": emptyFields } } } }, "POST")
@@ -308,13 +318,12 @@ const AssociateSignUp = () => {
 
   function scrollDown() {
     window.scrollTo(0, document.body.scrollHeight);
-    setCounterTratment(false)
   }
 
   return (
     <div>
-      {counterTratmentOptions && 
-        <div class="fixed-div">
+      {counterTratmentOptions &&
+        <div class="fixed-div" style={!counterCheck ? ({ backgroundColor: "" }) : ({ backgroundColor: "red", color: "white" })}>
           <div style={{ textAlign: "center" }}>Você pode selecionar até <b>10</b> motivos
             {formData.reason_treatment ? (
               <h5 style={{ marginTop: "7px" }}>{formData.reason_treatment.length}/10</h5>
@@ -506,7 +515,7 @@ const AssociateSignUp = () => {
             </label>
             <p style={{ color: "#fff", fontStyle: "italic" }}>Os dados deste campo são de acordo com o CIAP2 (Classificação Internacional de Atenção Primária) <a style={{ color: "#fff", fontWeight: "bold" }} href="https://saude.campinas.sp.gov.br/sistemas/esus/guia_CIAP2.pdf" target="_blank">Saiba Mais</a></p>
             <p style={{ color: "#fff", fontStyle: "italic" }}>No campo abaixo, pesquise pelo motivo do tratamento e selecione uma ou mais opções.</p>
-            <Ciap2Select handleChange={handleSelectionChange} id="reason_treatment" class="form-input input-login select-treatment" value={formData.reason_treatment} name="reason_treatment" counterCheck={counter} disableCheckbox={counterCheck} />
+            <Ciap2Select handleChange={handleSelectionChange} id="reason_treatment" class="form-input input-login select-treatment" value={formData.reason_treatment} name="reason_treatment" counterCheck={counter} />
           </div>
 
           <div className="mb-3">
@@ -516,6 +525,20 @@ const AssociateSignUp = () => {
             <textarea onChange={handleChangeInput} onBlur={handleChangeInput} value={formData.reason_treatment_text} id="reason_treatment_text" name="reason_treatment_text" />
           </div>
 
+          <div>
+            <label class="form-label">Como você conheceu a SouCannabis?</label>
+            <select className="form-input input-login"  id="met_us" name="met_us" onChange={handleChangeInput} onBlur={handleChangeInput} >
+              <option value="Outra">Selecione...</option>
+              <option value="Indicação de profissionais">Indicação de profissionais</option>
+              <option value="Indicação de amigos ou familiares">Indicação de amigos ou familiares</option>
+              <option value="Instagram">Instagram</option>
+              <option value="YouTube">YouTube</option>
+              <option value="Busca no google">Busca no Google</option>
+              <option value="Outra">Outra</option>
+            </select>
+          </div>
+          <br></br>
+          <br></br>
           <button class="btn btn-success btn-lg btn-float-right" type="submit">
             Enviar dados
           </button>
@@ -525,6 +548,11 @@ const AssociateSignUp = () => {
         </div>
 
         {fieldsError && <AlertError message="Você precisa preencher os seguintes campos: " emptyFields={emptyFieldsMessage} />}
+        {ciapError && (
+          <div class="alert2">
+            <AlertError message="Você marcou mais que 10 motivos para seu tratamento." />
+          </div>
+        )}
         {cpfError && (
           <div class="alert2">
             <AlertError message="O CPF precisa estar completo" />

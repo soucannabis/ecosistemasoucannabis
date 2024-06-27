@@ -2721,7 +2721,6 @@ const SelectComponent = ({ handleChange, counterCheck, disableCheckbox }) => {
                         handleOptionSelect(subcat);
                       }}
                       checked={selectedOptions.includes(subcat.value)}
-                      disabled={disableCheckbox}
                     />
                     {subcat.label}
                   </label>
