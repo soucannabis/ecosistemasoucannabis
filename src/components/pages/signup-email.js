@@ -57,11 +57,12 @@ function SignupEmail() {
 
     if (!validateEmail) {
       const serchEmail = await apiRequest("/api/directus/search", { query: "/items/Users?filter[email_account][_eq]=" + emailInput }, "POST");
-      console.log(serchEmail);
       if (serchEmail) {
         setErrorEmail(true);
       } else {
-        const userData = await apiRequest("/api/directus/create-user", { email_account: emailInput, associate_status: 0 }, "POST");
+        const url = new URL(window.location.href);
+        const partnerUrl = url.searchParams.get('p');
+        const userData = await apiRequest("/api/directus/create-user", { email_account: emailInput, partner: partnerUrl,associate_status: 0 }, "POST");
         localStorage.setItem("user_code", await userData.user_code);
         if (userData) {
           window.location.assign("/bem-vindo");
