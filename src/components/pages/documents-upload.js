@@ -333,7 +333,7 @@ const FileUploadComponent = () => {
         <br></br>
 
         <div style="text-align: center;color: #fff;">
-        <a href="https://enviararquivos.soucannabis.ong.br?u="+user.user_code>Algum problema em enviar seus documentos? Clique aqui</a>
+        <a href={"https://enviararquivos.soucannabis.ong.br?u="+user.user_code}>Algum problema em enviar seus documentos? Clique aqui</a>
         </div>
 
         <a className="label-upload assign-term" target="_blank" href={generateContract || user.contract} hidden={!rgProof}>
