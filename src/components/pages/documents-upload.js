@@ -333,7 +333,7 @@ const FileUploadComponent = () => {
         <br></br>
 
         <div style={{ textAlign: 'center', color: '#fff' }}>
-          <a style={{textDecoration:'none', color:'#fff'}} href={`https://enviararquivos.soucannabis.ong.br?u=${user.user_code}`}>
+          <a target="_blank" style={{textDecoration:'none', color:'#fff'}} href={`https://enviararquivos.soucannabis.ong.br?u=${user.user_code}`}>
             Algum problema em enviar seus documentos? Clique aqui
           </a>
         </div>
