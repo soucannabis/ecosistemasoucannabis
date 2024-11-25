@@ -82,7 +82,7 @@ function SignupEmail() {
   return (
     <div class="container">
       <div class="row justify-content-center">
-        <img class="logo" src="logo-santaguia.png"></img>
+        <img class="logo" src="logo.png"></img>
       </div>
       <h1 class="title" style={{ marginTop: "30px" }}>
         Cadastro de associado

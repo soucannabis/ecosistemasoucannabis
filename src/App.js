@@ -88,9 +88,9 @@ function App() {
             <div class="container vertical-center" hidden={hiddenLogin}>
               <div class="text-center login-div">
                 <img
-                  src="logo-santaguia2.png"
+                  src="logo.png"
                 />
-                <h1 class="sub-title"><b>Cadastramento Santa Guia</b></h1>
+                <h1 class="sub-title"><b>Cadastramento [nome_associação]</b></h1>
                 <br></br>
                 <div class="row">                
                   <Link to="/cadastro" class="btn btn-lg btn-success" hidden={hiddenButtons}>
@@ -115,7 +115,7 @@ function App() {
                   src="/logo.svg"
                   width="30%"
                 />
-                <h1 class="sub-title">Cadastramento Santa Guia</h1>
+                <h1 class="sub-title">Cadastramento [nome_associação]</h1>
                 <div class="row">                  
                   <Link to="/cadastro" class="btn btn-lg btn-success" hidden={hiddenButtons}>
                     Criar minha conta
