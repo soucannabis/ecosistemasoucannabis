@@ -527,7 +527,7 @@ const AssociateSignUp = () => {
           </div>
 
           <div>
-            <label class="form-label">Como você conheceu a SouCannabis?</label>
+            <label class="form-label">Como você conheceu a Mãe Maria?</label>
             <select className="form-input input-login"  id="met_us" name="met_us" onChange={handleChangeInput} onBlur={handleChangeInput} >
               <option value="Outra">Selecione...</option>
               <option value="Indicação de profissionais">Indicação de profissionais</option>

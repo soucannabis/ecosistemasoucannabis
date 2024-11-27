@@ -8,7 +8,7 @@ function Welcome() {
     <div class="container">
          <div className="homepage">
             <div>
-                <h1 class="title"> Olá, é um prazer receber você na <br></br>Associação Programa Mãe Maria</h1>
+                <h1 class="title"> Olá, é um prazer receber você no <br></br>Programa Mãe Maria</h1>
                 <br></br>
                 <h2 style={{textAlign:"center"}}>Siga todos os passos deste guia para se associar e contar com os benefícios da associação.</h2>
                 <h2 style={{textAlign:"center"}}>Você precisará informar seus dados pessoais, foto de documentos de identidade e comprovante de residência.</h2>

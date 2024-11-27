@@ -133,10 +133,6 @@ function MedicalAppointment() {
           <label className="btn btn-outline-primary radio-input" htmlFor="btnradio1">
             ENVIAR UMA RECEITA
           </label>
-          <ContactModal redirect="/cadastro" type="appointment" />
-          <label className="btn btn-outline-primary radio-input" onClick={medicalAppointmentNo} htmlFor="btnradio2">
-           AGENDAR UMA CONSULTA
-          </label>
           <label className="btn btn-outline-primary radio-input" onClick={aprove} htmlFor="btnradio3">
             CONCLUIR O CADASTRO SEM RECEITA
           </label>
