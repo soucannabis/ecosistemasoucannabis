@@ -24,8 +24,9 @@ const MenuTopo = () => {
   
   return (
     <nav className="navbar navbar-expand-lg navbar-light fixed-top">
-      <img style={{width:"12%"}} src="logo.png"></img>
+      <img style={{width:"3%"}} src="logo.png"></img>
       <div className="container-fluid">
+      <p style={{color:"#fff", marginTop:"10px"}}> Programa Mãe Maria</p>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             <li className="nav-item">

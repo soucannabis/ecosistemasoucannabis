@@ -90,7 +90,7 @@ function App() {
                 <img
                   src="logo.png"
                 />
-                <h1 class="sub-title"><b>Cadastramento [nome_associação]</b></h1>
+                <h1 class="sub-title"><b>Cadastramento Programa Mãe Maria</b></h1>
                 <br></br>
                 <div class="row">                
                   <Link to="/cadastro" class="btn btn-lg btn-success" hidden={hiddenButtons}>
@@ -112,10 +112,10 @@ function App() {
             <div class="container mobile-login" hidden={hiddenLogin}>
               <div class="text-center">
                 <img
-                  src="/logo.svg"
-                  width="30%"
+                  src="/logo.png"
+                  width="40%"
                 />
-                <h1 class="sub-title">Cadastramento [nome_associação]</h1>
+                <h1 class="sub-title">Cadastramento Programa Mãe Maria</h1>
                 <div class="row">                  
                   <Link to="/cadastro" class="btn btn-lg btn-success" hidden={hiddenButtons}>
                     Criar minha conta
