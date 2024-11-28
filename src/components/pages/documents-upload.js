@@ -204,9 +204,9 @@ const FileUploadComponent = () => {
           await apiRequest("/api/directus/update", { userId: user.id, formData: { status: "proofs" } }, "POST");
 
           const createContract = await apiRequest("/api/docuseal/create-contract", userData, "POST");
-          setGenerateContract(process.env.REACT_APP_DOCUSEAL_URL + "/s/" + (await createContract[0].slug));
+          setGenerateContract(import.meta.env.VITE_DOCUSEAL_URL + "/s/" + (await createContract[0].slug));
 
-          const bodyRequest = { contract: process.env.REACT_APP_DOCUSEAL_URL + "/s/" + (await createContract[0].slug) };
+          const bodyRequest = { contract: import.meta.env.VITE_DOCUSEAL_URL + "/s/" + (await createContract[0].slug) };
           await apiRequest("/api/directus/update", { userId: user.id, formData: bodyRequest }, "POST");
 
           setRgProof(true);

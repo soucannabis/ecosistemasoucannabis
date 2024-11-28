@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate, Link, useHistory } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate, Link } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import apiRequest from "../../modules/apiRequest";
 import CryptoJS from "crypto-js";
@@ -26,7 +26,7 @@ const LostPass = () => {
     return encrypted;
   }
 
-  const secretKey = process.env.REACT_APP_PASS_ENCRYPT;
+  const secretKey = import.meta.env.VITE_PASS_ENCRYPT;
 
   useEffect(() => {
     var url = window.location.href;
@@ -74,7 +74,7 @@ const LostPass = () => {
         <div class="alert alert-danger" role="alert">
           Link inválido, tempo exedido. Tente recuperar sua senha novamente.
           <br></br>
-          <a href={process.env.REACT_APP_URL}>Voltar</a>
+          <a href={import.meta.env.VITE_URL}>Voltar</a>
         </div>
       )}
 

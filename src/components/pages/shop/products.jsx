@@ -109,7 +109,7 @@ function Contact() {
             {filteredProducts.map(product => (
                 <tr key={product.cod} >
                   <td>
-                    <img src={process.env.REACT_APP_DIRECTUS_API_URL + "/assets/" + product.photo} width="50" height="50" onClick={() => addCart(product)} />
+                    <img src={import.meta.env.VITE_DIRECTUS_API_URL + "/assets/" + product.photo} width="50" height="50" onClick={() => addCart(product)} />
                   </td>
                   <td onClick={info} style={{ cursor: "pointer" }} cod={product.cod}>{product.name + " - " + product.concentration + "%"}</td>
                   <td>{product.description}</td>

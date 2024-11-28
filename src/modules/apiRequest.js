@@ -6,9 +6,9 @@ async function apiRequest(query, body, method, headers) {
   let config = {
     method: method,
     maxBodyLength: Infinity,
-    url: process.env.REACT_APP_SERVER_URL + query,
+    url: import.meta.env.VITE_SERVER_URL + query,
     headers: {
-      Authorization: process.env.REACT_APP_SERVER_API_TOKEN,
+      Authorization: import.meta.env.VITE_SERVER_API_TOKEN,
     },
     data: body,
   };

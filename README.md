@@ -25,13 +25,13 @@
   <li>npm install</li>
   <li>Crie um arquivo .env com as seguintes variaveis de ambiente</li>
   <br>
-  <p>REACT_APP_URL= //URL de instalação do Cadastramento</p>
-  <p>REACT_APP_SERVER_URL= //URL de instalação do Cadastramento Server</p>
-<p>REACT_APP_SERVER_API_TOKEN= //Cadastramento Server API Token</p>
-<p>REACT_APP_DIRECTUS_API_URL= //URL do Directus </p>
-<p>REACT_APP_DIRECTUS_API_TOKEN= //Token do Directus</p>
-<p>REACT_APP_DOCUSEAL_URL= //URL de instalação do Docuseal</p>
-<p>REACT_APP_PASS_ENCRYPT= //Senha aleatória para criação de criptografia</p>
+  <p>VITE_URL= //URL de instalação do Cadastramento</p>
+  <p>VITE_SERVER_URL= //URL de instalação do Cadastramento Server</p>
+<p>VITE_SERVER_API_TOKEN= //Cadastramento Server API Token</p>
+<p>VITE_DIRECTUS_API_URL= //URL do Directus </p>
+<p>VITE_DIRECTUS_API_TOKEN= //Token do Directus</p>
+<p>VITE_DOCUSEAL_URL= //URL de instalação do Docuseal</p>
+<p>VITE_PASS_ENCRYPT= //Senha aleatória para criação de criptografia</p>
 <p>WDS_SOCKET_PORT=0 //Variavel para funcionamento correto de Websockets</p>  
 <li>npm start</li>
 </ul>

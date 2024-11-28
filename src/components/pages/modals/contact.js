@@ -55,7 +55,7 @@ const Contact = ({ type }) => {
   const contact = async event => {
     event.preventDefault();
 
-    if (process.env.REACT_APP_UTALK) {
+    if (import.meta.env.VITE_UTALK) {
       if (type != "appointment") {
         await fetch("https://n8n.soucannabis.ong.br/webhook/da23155e-90a5-486e-9e74-9d1ece12e82d", {
           method: "POST",

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, Navigate, Link, useHistory } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate, Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import LoginForm from "./components/pages/loginForm";
 import ApproveAssociate from "./components/pages/approveAssociate";

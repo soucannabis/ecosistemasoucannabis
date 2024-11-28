@@ -38,7 +38,7 @@ function LoginForm() {
       await apiRequest("/api/directus/login", { email: emailInput, pass: passInput }, "POST")
         .then(async response => {        
          if(response.pass_account){
-          var userPass = decrypt(response.pass_account, process.env.REACT_APP_PASS_ENCRYPT);
+          var userPass = decrypt(response.pass_account, import.meta.env.VITE_PASS_ENCRYPT);
          }else{
           setLoginEmailError(true);
           setTimeout(() => {
