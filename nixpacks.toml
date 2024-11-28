@@ -1,6 +1,7 @@
-[phases]
+[phases.setup]
+nixpkgs = ["nodejs-18_x", "caddy"]
+
 [phases.build]
-nixpkgs = ["nodejs", "caddy"] # Inclui Node.js e Caddy
 commands = ["npm install", "npm run build"]
 
 [phases.start]
