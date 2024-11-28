@@ -5,4 +5,5 @@ nixpkgs = ["nodejs-18_x", "caddy"]
 commands = ["npm install", "npm run build"]
 
 [phases.start]
-commands = ["caddy run"]
+commands = ["caddy run --config Caddyfile"]
+
