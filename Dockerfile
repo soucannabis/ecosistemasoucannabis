@@ -13,7 +13,7 @@ COPY .env.example /app/
 RUN mv .env.example .env
 RUN npm install
 
-COPY .env .env
+COPY . .
 
 RUN npm run build
 
