@@ -82,7 +82,7 @@ function SignupEmail() {
   return (
     <div class="container">
       <div class="row justify-content-center">
-        <img class="logo" src="logo.png"></img>
+        <img class="logo" src={import.meta.env.VITE_ASSOCIATION_LOGO}></img>
       </div>
       <h1 class="title" style={{ marginTop: "30px" }}>
         Cadastro de associado

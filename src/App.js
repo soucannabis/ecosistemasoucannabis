@@ -88,9 +88,9 @@ function App() {
             <div class="container vertical-center" hidden={hiddenLogin}>
               <div class="text-center login-div">
                 <img
-                  src="logo.png"
+                  src={import.meta.env.VITE_ASSOCIATION_LOGO}
                 />
-                <h1 class="sub-title"><b>Cadastramento [nome_associação]</b></h1>
+                <h1 class="sub-title"><b>Cadastramento {import.meta.env.VITE_ASSOCIATION_NAME}</b></h1>
                 <br></br>
                 <div class="row">                
                   <Link to="/cadastro" class="btn btn-lg btn-success" hidden={hiddenButtons}>
@@ -103,7 +103,8 @@ function App() {
               </div>
               <Routes>
                 <Route path="/login" element={<LoginForm />} />
-                <Route path="/cadastro" element={<Signup />} />
+                <Route path="/cadastro" element={<Signup />} />          
+
               </Routes>
             </div>
           )}
@@ -115,7 +116,7 @@ function App() {
                   src="/logo.svg"
                   width="30%"
                 />
-                <h1 class="sub-title">Cadastramento [nome_associação]</h1>
+                <h1 class="sub-title">Cadastramento import.meta.env.VITE_ASSOCIATION_NAME</h1>
                 <div class="row">                  
                   <Link to="/cadastro" class="btn btn-lg btn-success" hidden={hiddenButtons}>
                     Criar minha conta

@@ -24,7 +24,7 @@ const MenuTopo = () => {
 
   return (
     <nav className="navbar  navbar-light fixed-top">
-      <img style={{width:"25%"}} src="logo.png"></img>
+      <img style={{width:"25%"}} src={import.meta.env.VITE_ASSOCIATION_LOGO}></img>
       <Contact />
       <div className="">
         <Dropdown>
