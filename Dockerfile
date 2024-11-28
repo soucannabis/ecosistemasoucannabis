@@ -13,11 +13,7 @@ COPY .env.example /app/
 RUN mv .env.example .env
 RUN npm install
 
-COPY . .
-
-RUN npm run build
-
-EXPOSE 5173
+EXPOSE 3000
 
 CMD ["npx", "serve", "-s", "dist"]
 
